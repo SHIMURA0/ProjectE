@@ -1,26 +1,25 @@
 import gradio as gr
-from langchain.llms import OpenAI
+import os
+from datetime import datetime
 
-# 使用 OpenAI 的 GPT 作为语言模型，确保替换为你自己的API密钥
-llm = OpenAI(temperature=0.7, openai_api_key="your-openai-api-key")
+# 定义保存数据的函数
+def greet(name):
+    # 获取当前时间
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # 将数据写入本地文件
+    with open("user_data.txt", "a", encoding="utf-8") as f:
+        f.write(f"{timestamp}: {name}\n")
+    return "Hello " + name + "!"
 
-# 定义处理用户输入并通过Langchain生成响应的函数
-def chatbot_response(input_text):
-    try:
-        # 获取Langchain模型的响应
-        response = llm(input_text)
-        return response
-    except Exception as e:
-        return str(e)
-
-# 创建一个 Gradio 接口，并将其绑定到上面定义的函数
-iface = gr.Interface(
-    fn=chatbot_response,
-    inputs="text",
-    outputs="text",
-    title="Langchain Chatbot Demo",
-    description="Ask anything and get a response!",
+# 创建 Gradio 接口
+demo = gr.Interface(
+    fn=greet,
+    inputs=gr.Textbox(label="请输入您的名字"),
+    outputs=gr.Textbox(label="问候"),
+    title="问候应用",
+    description="请输入您的名字，我们将向您打招呼并保存您的数据。"
 )
 
-# 启动 Gradio 接口
-iface.launch()
+# 启动应用，并生成公开分享链接
+demo.launch(share=True)
+
